@@ -4,22 +4,20 @@
 require 'ffi'
 
 Vagrant.configure("2") do |config|
-    config.vm.box = "timveil/centos7-hdp-base"
+    config.vm.box = "centos/7"
     config.vm.box_check_update = true
 
-    # configure VM
-    # config.vm.hostname is broken in vagrant 1.9.0; works in 1.9.1
-    config.vm.hostname = 'default.hdp.local'
-    config.vm.network "private_network", ip: '192.168.7.101'
+    config.vm.hostname = 'hdp26.um.local'
+    config.vm.network "private_network", ip: '192.168.7.126'
     config.vm.provider "virtualbox" do |v|
         v.memory = 8192
         v.cpus = 4
-        v.name = 'default.hdp.local'
+        v.name = 'hdp26.um.local'
     end
 
     if FFI::Platform::IS_MAC
         # configure host updater plugin - https://github.com/cogitatio/vagrant-hostsupdater
-        config.hostsupdater.aliases = ["default"]
+        config.hostsupdater.aliases = ["hdp26"]
 
         # configure VirtualBox Guest Additions plugin - https://github.com/dotless-de/vagrant-vbguest
         config.vbguest.auto_update = true
@@ -27,7 +25,6 @@ Vagrant.configure("2") do |config|
         config.vbguest.no_install = false
     end
 
-    # workaround for https://github.com/mitchellh/vagrant/issues/8096; impacts 1.9.1
     config.vm.provision "shell", inline: "service network restart", run: "always"
 
     # provision VM
@@ -35,5 +32,5 @@ Vagrant.configure("2") do |config|
     config.vm.provision "file", source: "blueprint.json", destination: "/tmp/install/blueprint.json"
     config.vm.provision "file", source: "create-cluster.json", destination: "/tmp/install/create-cluster.json"
     config.vm.provision "Install", type: "shell", keep_color: "true", path: "install.sh"
-    config.vm.provision "Ambari Details", type: "shell", inline: "echo 'Ambari URL is http://default.hdp.local:8080 or http://default:8080 or http://192.168.7.101:8080'", run: "always"
+    config.vm.provision "Ambari Details", type: "shell", inline: "echo 'Ambari URL is http://hdp26.um.local:8080 or http://hdp26:8080 or http://192.168.7.126:8080'", run: "always"
 end
