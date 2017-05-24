@@ -33,7 +33,7 @@ echo "----- updating hostname"
 echo "---------------------------------------------------------------------------------------------------------------"
 echo " "
 
-hostnamectl --static set-hostname hdp26
+hostnamectl --static set-hostname test26
 
 echo " "
 echo "---------------------------------------------------------------------------------------------------------------"
@@ -65,7 +65,7 @@ echo "----- updating ambari-agent.ini"
 echo "---------------------------------------------------------------------------------------------------------------"
 echo " "
 
-sed -i "s/^hostname=localhost/hostname=hdp26.um.local/g" /etc/ambari-agent/conf/ambari-agent.ini
+sed -i "s/^hostname=localhost/hostname=test26.um.local/g" /etc/ambari-agent/conf/ambari-agent.ini
 
 
 echo " "
@@ -93,12 +93,12 @@ echo "----- calling ambari REST apis"
 echo "---------------------------------------------------------------------------------------------------------------"
 echo " "
 
-curl -H "X-Requested-By: ambari" -X POST -d '@/tmp/install/blueprint.json' -u admin:admin http://hdp26.um.local:8080/api/v1/blueprints/generated
-curl -H "X-Requested-By: ambari" -X POST -d '@/tmp/install/create-cluster.json' -u admin:admin http://hdp26.um.local:8080/api/v1/clusters/default
+curl -H "X-Requested-By: ambari" -X POST -d '@/tmp/install/blueprint.json' -u admin:admin http://test26.um.local:8080/api/v1/blueprints/generated
+curl -H "X-Requested-By: ambari" -X POST -d '@/tmp/install/create-cluster.json' -u admin:admin http://test26.um.local:8080/api/v1/clusters/default
 
 PROGRESS=0
 until [ $PROGRESS -eq 100 ]; do
-    PROGRESS=`curl --silent --show-error -H "X-Requested-By: ambari" -X GET -u admin:admin http://hdp26.um.local:8080/api/v1/clusters/default/requests/1 2>&1 | grep -oP '\"progress_percent\"\s+\:\s+\K[0-9]+'`
+    PROGRESS=`curl --silent --show-error -H "X-Requested-By: ambari" -X GET -u admin:admin http://test26.um.local:8080/api/v1/clusters/default/requests/1 2>&1 | grep -oP '\"progress_percent\"\s+\:\s+\K[0-9]+'`
     TIMESTAMP=$(date "+%m/%d/%y %H:%M:%S")
     echo -ne "$TIMESTAMP - $PROGRESS percent complete!"\\r
     sleep 60
